@@ -145,3 +145,10 @@ gradle-app.setting
 src/main/generated/*
 
 # End of https://www.toptal.com/developers/gitignore/api/java,gradle,intellij+all
+
+### NPM ###
+src/main/resources/static/node_modules
+src/main/resources/static/node
+
+target/*
+
