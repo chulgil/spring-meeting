@@ -19,7 +19,7 @@
             max-width: 100%;
         }
 
-        .tagify-outside{
+        .tagify-outside {
             border: 0;
             padding: 0;
             margin: 0;
@@ -79,6 +79,7 @@
             margin-bottom: 0;
             background-color: #fff;
         }
+
         @media (min-width: 768px) {
             .jumbotron {
                 padding-top: 6rem;
@@ -128,11 +129,11 @@
                 <a class="nav-link" th:href="@{/sign-up}">가입</a>
             </li>
             <li class="nav-item" sec:authorize="isAuthenticated()">
-                <a class="nav-link" th:href="@{/notifications}">
-                    <i th:if="${!hasNotification}" class="fa fa-bell-o" aria-hidden="true"></i>
-                    <span class="text-info" th:if="${hasNotification}"><i class="fa fa-bell"
-                                                                          aria-hidden="true"></i></span>
-                </a>
+                <!--                <a class="nav-link" th:href="@{/notifications}">-->
+                <!--                    <i th:if="${!hasNotification}" class="fa fa-bell-o" aria-hidden="true"></i>-->
+                <!--                    <span class="text-info" th:if="${hasNotification}"><i class="fa fa-bell"-->
+                <!--                                                                          aria-hidden="true"></i></span>-->
+                <!--                </a>-->
             </li>
             <li class="nav-item" sec:authorize="isAuthenticated()">
                 <a class="nav-link btn btn-outline-primary" th:href="@{/new-study}">
@@ -212,7 +213,7 @@
 
 <script type="application/javascript" th:inline="javascript" th:fragment="ajax-csrf-header">
     // <!-- https://okky.kr/articles/487431   -->
-    $(function() {
+    $(function () {
         var token = $("meta[name='_csrf']").attr("content");
         var header = $("meta[name='_csrf_header']").attr("content");
         $(document).ajaxSend(function (e, xhr, options) {
@@ -384,8 +385,9 @@
 
 <script src="/node/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
 <script type="application/javascript" th:inline="javascript">
-    $(function() {
+    $(function () {
         var studyPath = "[(${study.path})]";
+
         function tagRequest(url, tagTitle) {
             $.ajax({
                 dataType: "json",
@@ -414,7 +416,7 @@
         var tagify = new Tagify(tagInput, {
             pattern: /^.{0,20}$/,
             whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
-            dropdown : {
+            dropdown: {
                 enabled: 1, // suggest tags after a single character input
             } // map tags
         });
@@ -431,7 +433,7 @@
 <div th:fragment="update-tags (baseUrl)">
     <script src="/node/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
     <script type="application/javascript" th:inline="javascript">
-        $(function() {
+        $(function () {
             function tagRequest(url, tagTitle) {
                 $.ajax({
                     dataType: "json",
@@ -460,7 +462,7 @@
             var tagify = new Tagify(tagInput, {
                 pattern: /^.{0,20}$/,
                 whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
-                dropdown : {
+                dropdown: {
                     enabled: 1, // suggest tags after a single character input
                 } // map tags
             });
@@ -508,7 +510,7 @@
             var tagify = new Tagify(tagInput, {
                 enforceWhitelist: true,
                 whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
-                dropdown : {
+                dropdown: {
                     enabled: 1, // suggest tags after a single character input
                 } // map tags
             });
@@ -530,25 +532,25 @@
     <script type="application/javascript">
         $(function () {
             moment.locale('ko');
-            $(".date-time").text(function(index, dateTime) {
+            $(".date-time").text(function (index, dateTime) {
                 return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LLL');
             });
-            $(".date").text(function(index, dateTime) {
+            $(".date").text(function (index, dateTime) {
                 return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LL');
             });
-            $(".weekday").text(function(index, dateTime) {
+            $(".weekday").text(function (index, dateTime) {
                 return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('dddd');
             });
-            $(".time").text(function(index, dateTime) {
+            $(".time").text(function (index, dateTime) {
                 return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LT');
             });
-            $(".calendar").text(function(index, dateTime) {
+            $(".calendar").text(function (index, dateTime) {
                 return moment(dateTime, "YYYY-MM-DD`T`hh:mm").calendar();
             });
-            $(".fromNow").text(function(index, dateTime) {
+            $(".fromNow").text(function (index, dateTime) {
                 return moment(dateTime, "YYYY-MM-DD`T`hh:mm").fromNow();
             });
-            $(".date-weekday-time").text(function(index, dateTime) {
+            $(".date-weekday-time").text(function (index, dateTime) {
                 return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LLLL');
             });
         })

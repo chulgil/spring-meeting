@@ -28,6 +28,7 @@ public class Account {
     private String emailCheckToken;
 
     private LocalDateTime joindAt;
+    private LocalDateTime emailCheckedAt;
 
     private String bio;
 
@@ -38,7 +39,7 @@ public class Account {
     private String location;
 
     @Lob @Basic(fetch = FetchType.EAGER)
-    private String img;
+    private String profileImage;
 
     private boolean createdByEmail;
 
@@ -55,10 +56,19 @@ public class Account {
 
     public void generateEmailCheckToken() {
         this.emailCheckToken = UUID.randomUUID().toString();
+        this.emailCheckedAt = LocalDateTime.now();
     }
 
     public void completeSignUp() {
         this.emailVerified = true;
         this.joindAt =LocalDateTime.now();
+    }
+
+    public boolean isValidToken(String token) {
+        return this.emailCheckToken.equals(token);
+    }
+
+    public boolean canSendConfirmEmail() {
+        return this.emailCheckedAt.isBefore(LocalDateTime.now().minusMinutes(1));
     }
 }

@@ -5,8 +5,7 @@ import me.chulgil.spring.meeting.modules.account.domain.Account;
 import me.chulgil.spring.meeting.modules.account.form.SignUp;
 import me.chulgil.spring.meeting.modules.account.validator.AccountRepository;
 import me.chulgil.spring.meeting.modules.account.validator.SignUpValidator;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import me.chulgil.spring.meeting.modules.main.CurrentUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 
 @Controller
 @RequiredArgsConstructor
@@ -43,8 +41,9 @@ public class AccountController {
         if (errors.hasErrors()) {
             return "account/sign-up";
         }
-        accountService.processNewAccount(signUp);
 
+        Account account = accountService.processNewAccount(signUp);
+        accountService.login(account);
 
         return "redirect:/";
     }
@@ -58,14 +57,35 @@ public class AccountController {
             return view;
         }
 
-        if(!account.getEmailCheckToken().equals(token)) {
+        if (!account.isValidToken(token)) {
             model.addAttribute("error", "invalid.token");
             return view;
         }
 
         account.completeSignUp();
+        accountService.login(account);
         model.addAttribute("numberOfUser", accountRepository.count());
         model.addAttribute("nickname", account.getNickname());
         return view;
     }
+
+    @GetMapping("check-email")
+    public String checkEmail(@CurrentUser Account account, Model model) {
+        model.addAttribute("email", account.getEmail());
+        return "account/check-email";
+    }
+
+    @GetMapping("resend-confirm-email")
+    public String resendConfirmEmail(@CurrentUser Account account, Model model) {
+        if (!account.canSendConfirmEmail()) {
+            model.addAttribute("error", "인증 이메일은 1분에 한번만 전송할 수 있습니다.");
+            model.addAttribute(account);
+            return "account/check-email";
+        }
+        accountService.sendSignUpConfirmEmail(account);
+
+        // 동일 URL 남아있으면 계속해서 메일을 보내는 문제를 해결하기위해 리다이렉트함
+        return "redirect:/";
+    }
+
 }

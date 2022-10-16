@@ -31,7 +31,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
         ;
 
-
+        http.formLogin().loginPage("/login").permitAll();
+        http.logout().logoutSuccessUrl("/");
     }
 
     /**
@@ -42,9 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
                 .mvcMatchers("/node/node_modules/**")
-                .mvcMatchers("/favicon.ico")
-                .mvcMatchers("/images/**")
-                .antMatchers("/resources/static/**");
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
         /**
          * 기타 사용 예재
          * .antMatchers("/images/**")

@@ -1,0 +1,15 @@
+@startuml
+
+start
+fork
+    :가입확인 메일 재전송;
+    -> GET check-email;
+    :가입시 입력한 메일을 화면출력;
+    if (재전송버튼클릭) then (true)
+        : GET resend-confirm-email;
+    endif
+    : this end;
+
+stop
+
+@enduml

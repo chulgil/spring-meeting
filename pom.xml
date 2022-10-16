@@ -55,6 +55,7 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
+			<version>2.1.210</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -101,13 +102,17 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<!--https://swampwar.github.io/2020/06/05/frontend-maven-plugin-적용.html-->
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.8.0</version>
+				<version>1.10.0</version>
 				<configuration>
-					<nodeVersion>v4.6.0</nodeVersion>
-					<workingDirectory>src/main/resources/static</workingDirectory>
+					<!-- package.js와 frontend 설정파일이 있는 디렉터리 -->
+					<workingDirectory>src/main/resources/static/node</workingDirectory>
+					<!-- 로컬에 install될 디렉터리 -->
+					<installDirectory>target</installDirectory>
 				</configuration>
 				<executions>
 					<execution>
@@ -116,6 +121,10 @@
 							<goal>install-node-and-npm</goal>
 						</goals>
 						<phase>generate-resources</phase>
+						<configuration>
+							<nodeVersion>v18.9.1</nodeVersion>
+							<npmVersion>6.14.4</npmVersion>
+						</configuration>
 					</execution>
 					<execution>
 						<id>npm install</id>
