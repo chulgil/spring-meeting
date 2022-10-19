@@ -1,16 +1,20 @@
 package me.chulgil.spring.meeting.infra.config;
 
 
+import lombok.RequiredArgsConstructor;
+import me.chulgil.spring.meeting.modules.account.AccountService;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 /**
  * SpringSecurity를 이용하기 위한 설정 클래스
@@ -18,9 +22,11 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @EnableWebSecurity     // 스프링 Security Filter가 Spring Fileter Chain에 등록됨
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-
+    private final AccountService accountService;
+    private final DataSource dataSource;
 
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -31,9 +37,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
         ;
 
-        http.formLogin().loginPage("/login").permitAll();
-        http.logout().logoutSuccessUrl("/");
+        http.formLogin() //Form 로그인 인증 기능이 작동함
+                .loginPage("/login") //사용자 정의 로그인 페이지
+                .defaultSuccessUrl("/")//로그인 성공 후 이동 페이지
+                .permitAll();  //사용자 정의 로그인 페이지 접근 권한 승인
+
+        http.logout()
+                .logoutSuccessUrl("/");
+
+        http.rememberMe()
+                .userDetailsService(accountService)
+                .tokenRepository(tokenRepository());
     }
+
+    @Bean
+    public PersistentTokenRepository tokenRepository() {
+        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+        jdbcTokenRepository.setDataSource(dataSource);
+        return jdbcTokenRepository;
+    }
+
 
     /**
      * Security 설정을 무시하는 요청을 설정
@@ -43,6 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
                 .mvcMatchers("/node/node_modules/**")
+                .antMatchers("/favicon.ico", "/resources/**", "/error")
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
         /**
          * 기타 사용 예재

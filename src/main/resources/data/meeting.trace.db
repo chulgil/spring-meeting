@@ -119,3 +119,12 @@ Caused by: org.h2.jdbc.JdbcSQLInvalidAuthorizationSpecException: Wrong user name
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:529)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:496)
 	... 8 more
+2022-10-18 01:51:39 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PERSISTENT_LOGINS" not found; SQL statement:
+insert into persistent_logins (username, series, token, last_used) values(?,?,?,?) [42102-210]
+2022-10-18 01:52:43 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PERSISTENT_LOGINS" not found; SQL statement:
+delete from persistent_logins where username = ? [42102-210]
+2022-10-18 01:53:32 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PERSISTENT_LOGINS" not found; SQL statement:
+delete from persistent_logins where username = ? [42102-210]
