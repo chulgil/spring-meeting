@@ -2,7 +2,7 @@ package me.chulgil.spring.meeting.modules.account.domain;
 
 import lombok.RequiredArgsConstructor;
 import me.chulgil.spring.meeting.modules.account.AccountService;
-import me.chulgil.spring.meeting.modules.account.form.SignUp;
+import me.chulgil.spring.meeting.modules.account.form.SignUpForm;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -29,11 +29,11 @@ public class WithAccountSecurityContextFactory implements WithSecurityContextFac
         return context;
     }
 
-    private SignUp createSignUp(String nickname) {
-        SignUp signUp = new SignUp();
-        signUp.setNickname(nickname);
-        signUp.setEmail(nickname + "@test.com");
-        signUp.setPassword("password");
-        return signUp;
+    private SignUpForm createSignUp(String nickname) {
+        SignUpForm signUpForm = new SignUpForm();
+        signUpForm.setNickname(nickname);
+        signUpForm.setEmail(nickname + "@test.com");
+        signUpForm.setPassword("password");
+        return signUpForm;
     }
 }

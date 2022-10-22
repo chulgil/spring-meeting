@@ -9,7 +9,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
 @Data
-public class SignUp {
+public class SignUpForm {
 
     @NotBlank
     @Length(min = 3, max = 20)

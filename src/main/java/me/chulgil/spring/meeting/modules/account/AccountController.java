@@ -2,7 +2,7 @@ package me.chulgil.spring.meeting.modules.account;
 
 import lombok.RequiredArgsConstructor;
 import me.chulgil.spring.meeting.modules.account.domain.Account;
-import me.chulgil.spring.meeting.modules.account.form.SignUp;
+import me.chulgil.spring.meeting.modules.account.form.SignUpForm;
 import me.chulgil.spring.meeting.modules.account.validator.AccountRepository;
 import me.chulgil.spring.meeting.modules.account.validator.SignUpValidator;
 import me.chulgil.spring.meeting.modules.main.CurrentUser;
@@ -33,17 +33,17 @@ public class AccountController {
 
     @GetMapping("sign-up")
     public String signUpForm(Model model) {
-        model.addAttribute(new SignUp());
+        model.addAttribute(new SignUpForm());
         return "account/sign-up";
     }
 
     @PostMapping("sign-up")
-    public String signUpSubmit(@Valid SignUp signUp, Errors errors) {
+    public String signUpSubmit(@Valid SignUpForm signUpForm, Errors errors) {
         if (errors.hasErrors()) {
             return "account/sign-up";
         }
 
-        Account account = accountService.processNewAccount(signUp);
+        Account account = accountService.processNewAccount(signUpForm);
         accountService.login(account);
 
         return "redirect:/";

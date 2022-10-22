@@ -2,19 +2,25 @@ package me.chulgil.spring.meeting.modules.account;
 
 import lombok.RequiredArgsConstructor;
 import me.chulgil.spring.meeting.modules.account.domain.Account;
+import me.chulgil.spring.meeting.modules.account.form.PasswordForm;
 import me.chulgil.spring.meeting.modules.account.form.Profile;
+import me.chulgil.spring.meeting.modules.account.validator.PasswordValidator;
 import me.chulgil.spring.meeting.modules.main.CurrentUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
+import static me.chulgil.spring.meeting.modules.account.SettingsController.ROOT;
+import static me.chulgil.spring.meeting.modules.account.SettingsController.SETTINGS;
+
+
 @Controller
+@RequestMapping(ROOT + SETTINGS)
 @RequiredArgsConstructor
 public class SettingsController {
 
@@ -22,17 +28,20 @@ public class SettingsController {
     static final String ROOT = "/";
     static final String SETTINGS = "settings";
     static final String PROFILE = "/profile";
-
-    static final String SETTINGS_PROFILE_VIEW_NAME = SETTINGS + PROFILE;
-    static final String SETTINGS_PROFILE_URL = ROOT + SETTINGS + PROFILE;
+    static final String PASSWORD = "/password";
 
     private final AccountService accountService;
 
-    @GetMapping(SETTINGS_PROFILE_URL)
-    public String profileUpdateForm(@CurrentUser Account account, Model model) {
+    @InitBinder("passwordForm")
+    public void initBinder(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(new PasswordValidator());
+    }
+
+    @GetMapping(PROFILE)
+    public String updateProfileForm(@CurrentUser Account account, Model model) {
         model.addAttribute(account);
         model.addAttribute(new Profile(account));
-        return SETTINGS_PROFILE_VIEW_NAME;
+        return SETTINGS + PROFILE;
     }
 
     /**
@@ -48,17 +57,37 @@ public class SettingsController {
      * @param model
      * @return
      */
-    @PostMapping(SETTINGS_PROFILE_URL)
+    @PostMapping(PROFILE)
     public String updateProfile(@CurrentUser Account account, @Valid @ModelAttribute Profile profile, Errors errors,
                                 Model model, RedirectAttributes attributes) {
         if (errors.hasErrors()) {
             model.addAttribute(account);
-            return SETTINGS_PROFILE_VIEW_NAME;
+            return SETTINGS + PROFILE;
         }
         accountService.updateProfile(account, profile);
         // 1회성 데이터
         attributes.addFlashAttribute("message", "프로필을 수정했습니다.");
-        return "redirect:" + SETTINGS_PROFILE_URL;
+        return "redirect:/" + SETTINGS + PROFILE;
+    }
+
+    @GetMapping(PASSWORD)
+    public String updatePasswordForm(@CurrentUser Account account, Model model) {
+        model.addAttribute(account);
+        model.addAttribute(new PasswordForm());
+        return SETTINGS + PASSWORD;
+    }
+
+    @PostMapping(PASSWORD)
+    public String updatePassword(@CurrentUser Account account, @Valid PasswordForm passwordForm, Errors errors,
+                                 Model model, RedirectAttributes attributes) {
+        if (errors.hasErrors()) {
+            model.addAttribute(account);
+            return SETTINGS + PASSWORD;
+        }
+
+        accountService.updatePassword(account, passwordForm.getNewPassword());
+        attributes.addFlashAttribute("message", "패스워드를 변경 했습니다.");
+        return "redirect:/" + SETTINGS + PASSWORD;
     }
 
 }

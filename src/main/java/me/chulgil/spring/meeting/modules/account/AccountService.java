@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import me.chulgil.spring.meeting.modules.account.domain.Account;
 import me.chulgil.spring.meeting.modules.account.domain.UserAccount;
 import me.chulgil.spring.meeting.modules.account.form.Profile;
-import me.chulgil.spring.meeting.modules.account.form.SignUp;
+import me.chulgil.spring.meeting.modules.account.form.SignUpForm;
 import me.chulgil.spring.meeting.modules.account.validator.AccountRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -29,18 +29,18 @@ public class AccountService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public Account processNewAccount(SignUp signUp) {
-        Account newAccount = saveNewAccount(signUp);
+    public Account processNewAccount(SignUpForm signUpForm) {
+        Account newAccount = saveNewAccount(signUpForm);
         newAccount.generateEmailCheckToken();
         sendSignUpConfirmEmail(newAccount);
         return newAccount;
     }
 
-    private Account saveNewAccount(SignUp signUp) {
+    private Account saveNewAccount(SignUpForm signUpForm) {
         Account account = Account.builder()
-                .email(signUp.getEmail())
-                .nickname(signUp.getNickname())
-                .password(passwordEncoder.encode(signUp.getPassword()))
+                .email(signUpForm.getEmail())
+                .nickname(signUpForm.getNickname())
+                .password(passwordEncoder.encode(signUpForm.getPassword()))
                 .emailVerified(false)
                 .createdByWeb(true)
                 .updatedByWeb(true)
@@ -132,4 +132,11 @@ public class AccountService implements UserDetailsService {
 
         accountRepository.save(account);
     }
+
+    public void updatePassword(Account account, String newPassword) {
+        account.setPassword(passwordEncoder.encode(newPassword));
+        accountRepository.save(account);
+    }
+
+
 }

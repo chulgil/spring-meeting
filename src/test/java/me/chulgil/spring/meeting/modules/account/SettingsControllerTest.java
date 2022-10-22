@@ -2,7 +2,7 @@ package me.chulgil.spring.meeting.modules.account;
 
 import me.chulgil.spring.meeting.modules.account.domain.Account;
 import me.chulgil.spring.meeting.modules.account.domain.WithAccount;
-import me.chulgil.spring.meeting.modules.account.form.SignUp;
+import me.chulgil.spring.meeting.modules.account.form.SignUpForm;
 import me.chulgil.spring.meeting.modules.account.validator.AccountRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,10 +32,10 @@ class SettingsControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        SignUp signUp = new SignUp();
-        signUp.setNickname("testAccount");
-        signUp.setEmail("test@test.com");
-        signUp.setPassword("password");
+        SignUpForm signUpForm = new SignUpForm();
+        signUpForm.setNickname("testAccount");
+        signUpForm.setEmail("test@test.com");
+        signUpForm.setPassword("password");
         //accountService.processNewAccount(signUp);
         System.out.println("========================Before");
     }
