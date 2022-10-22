@@ -23,11 +23,13 @@ public class Account {
 
     private String password;
 
+    private String occupation;
+
     private boolean emailVerified;
 
     private String emailCheckToken;
 
-    private LocalDateTime joindAt;
+    private LocalDateTime joinedAt;
     private LocalDateTime emailCheckedAt;
 
     private String bio;
@@ -59,9 +61,9 @@ public class Account {
         this.emailCheckedAt = LocalDateTime.now();
     }
 
-    public void completeSignUp() {
+    public void  completeSignUp() {
         this.emailVerified = true;
-        this.joindAt =LocalDateTime.now();
+        this.joinedAt =LocalDateTime.now();
     }
 
     public boolean isValidToken(String token) {

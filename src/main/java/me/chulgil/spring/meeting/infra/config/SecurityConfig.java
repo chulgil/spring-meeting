@@ -39,7 +39,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.formLogin() //Form 로그인 인증 기능이 작동함
                 .loginPage("/login") //사용자 정의 로그인 페이지
-                .defaultSuccessUrl("/")//로그인 성공 후 이동 페이지
                 .permitAll();  //사용자 정의 로그인 페이지 접근 권한 승인
 
         http.logout()
