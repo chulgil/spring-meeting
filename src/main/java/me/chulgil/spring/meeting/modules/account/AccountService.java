@@ -128,6 +128,7 @@ public class AccountService implements UserDetailsService {
         account.setOccupation(profile.getOccupation());
         account.setBio(profile.getBio());
         account.setLocation(profile.getLocation());
+        account.setProfileImage(profile.getProfileImage());
 
         accountRepository.save(account);
     }
