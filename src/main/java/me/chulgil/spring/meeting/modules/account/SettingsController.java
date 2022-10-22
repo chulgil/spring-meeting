@@ -2,10 +2,13 @@ package me.chulgil.spring.meeting.modules.account;
 
 import lombok.RequiredArgsConstructor;
 import me.chulgil.spring.meeting.modules.account.domain.Account;
+import me.chulgil.spring.meeting.modules.account.form.NicknameForm;
+import me.chulgil.spring.meeting.modules.account.form.Notifications;
 import me.chulgil.spring.meeting.modules.account.form.PasswordForm;
 import me.chulgil.spring.meeting.modules.account.form.Profile;
 import me.chulgil.spring.meeting.modules.account.validator.PasswordValidator;
 import me.chulgil.spring.meeting.modules.main.CurrentUser;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -29,8 +32,13 @@ public class SettingsController {
     static final String SETTINGS = "settings";
     static final String PROFILE = "/profile";
     static final String PASSWORD = "/password";
+    static final String NOTIFICATIONS = "/notifications";
+    static final String ACCOUNT = "/account";
 
     private final AccountService accountService;
+
+    private final ModelMapper modelMapper;
+
 
     @InitBinder("passwordForm")
     public void initBinder(WebDataBinder webDataBinder) {
@@ -40,7 +48,7 @@ public class SettingsController {
     @GetMapping(PROFILE)
     public String updateProfileForm(@CurrentUser Account account, Model model) {
         model.addAttribute(account);
-        model.addAttribute(new Profile(account));
+        model.addAttribute(modelMapper.map(account, Profile.class));
         return SETTINGS + PROFILE;
     }
 
@@ -88,6 +96,47 @@ public class SettingsController {
         accountService.updatePassword(account, passwordForm.getNewPassword());
         attributes.addFlashAttribute("message", "패스워드를 변경 했습니다.");
         return "redirect:/" + SETTINGS + PASSWORD;
+    }
+
+
+    @GetMapping(NOTIFICATIONS)
+    public String updateNotificationsForm(@CurrentUser Account account, Model model) {
+        model.addAttribute(account);
+        model.addAttribute(modelMapper.map(account, Notifications.class));
+        return SETTINGS + NOTIFICATIONS;
+    }
+
+    @PostMapping(NOTIFICATIONS)
+    public String updateNotifications(@CurrentUser Account account, @Valid Notifications notifications, Errors errors,
+                                      Model model, RedirectAttributes attributes) {
+        if (errors.hasErrors()) {
+            model.addAttribute(account);
+            return SETTINGS + NOTIFICATIONS;
+        }
+
+        accountService.updateNotifications(account, notifications);
+        attributes.addFlashAttribute("message", "알림 설정을 변경했습니다.");
+        return "redirect:/" + SETTINGS + NOTIFICATIONS;
+    }
+
+    @GetMapping(ACCOUNT)
+    public String updateAccountForm(@CurrentUser Account account, Model model) {
+        model.addAttribute(account);
+        model.addAttribute(modelMapper.map(account, NicknameForm.class));
+        return SETTINGS + ACCOUNT;
+    }
+
+    @PostMapping(ACCOUNT)
+    public String updateAccount(@CurrentUser Account account, @Valid NicknameForm nickNameForm, Errors errors,
+                                    Model model, RedirectAttributes attributes) {
+        if (errors.hasErrors()) {
+            model.addAttribute(account);
+            return SETTINGS + ACCOUNT;
+        }
+
+        accountService.updateNickname(account, nickNameForm.getNickname());
+        attributes.addFlashAttribute("message", "닉네임을 수정했습니다.");
+        return "redirect:/" + SETTINGS + ACCOUNT;
     }
 
 }
