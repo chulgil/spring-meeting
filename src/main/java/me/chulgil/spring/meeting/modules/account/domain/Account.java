@@ -1,9 +1,11 @@
 package me.chulgil.spring.meeting.modules.account.domain;
 
 import lombok.*;
+import me.chulgil.spring.meeting.modules.tag.Tag;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -55,6 +57,9 @@ public class Account {
     private boolean notifyByEmail;
 
     private boolean notifyByWeb;
+
+    @ManyToMany
+    private Set<Tag> tags;
 
     public void generateEmailCheckToken() {
         this.emailCheckToken = UUID.randomUUID().toString();

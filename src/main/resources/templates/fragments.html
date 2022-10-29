@@ -19,10 +19,26 @@
             max-width: 100%;
         }
 
-        .tagify-outside {
+        .tagify--outside {
             border: 0;
-            padding: 0;
-            margin: 0;
+            display: flex;
+        }
+
+        .tagify--outside .tagify__input {
+            order: -1;
+            flex: 100%;
+            border: 1px solid var(--tags-border-color);
+            margin-bottom: 1em;
+            transition: .1s;
+        }
+
+        .tagify--outside .tagify__input:hover {
+            border-color: var(--tags-hover-border-color);
+        }
+
+        .tagify--outside.tagify--focus .tagify__input {
+            transition: 0s;
+            border-color: var(--tags-focus-border-color);
         }
 
         #meeting-logo {
@@ -168,7 +184,7 @@
 
 <footer th:fragment="footer">
     <div class="row justify-content-center">
-<!--        <img class="mb-2" src="/images/logo_long_kr.jpg" alt="" width="100">-->
+        <!--        <img class="mb-2" src="/images/logo_long_kr.jpg" alt="" width="100">-->
         <small class="d-block mb-3 text-muted">&copy; 2022</small>
     </div>
 </footer>
@@ -213,9 +229,12 @@
 
 <script type="application/javascript" th:inline="javascript" th:fragment="ajax-csrf-header">
     // <!-- https://okky.kr/articles/487431   -->
+    // 타임리프가 제공하는 자바스크립트 인라인 기능을 사용하여 구성
     $(function () {
-        var token = $("meta[name='_csrf']").attr("content");
-        var header = $("meta[name='_csrf_header']").attr("content");
+        // 스프링시큐리티를 사용하면 _csrf.token은 항상 참조 가능하다
+        // 자바스크립트의 참조를 깨뜨리지 않는 네츄럴 템플릿 방법으로 구현한다.
+        var token = /*[[${_csrf.token}]]*/ null;
+        var header = /*[[${_csrf.headerName}]]*/ null;
         $(document).ajaxSend(function (e, xhr, options) {
             xhr.setRequestHeader(header, token);
         });
@@ -261,7 +280,8 @@
                        th:text="${meeting.members.size()}">1</a>
                 </span>
             <span sec:authorize="isAuthenticated()"
-                  th:if="${!meeting.closed && meeting.isMember(#authentication.principal)}" class="btn-group" role="group">
+                  th:if="${!meeting.closed && meeting.isMember(#authentication.principal)}" class="btn-group"
+                  role="group">
                     <a class="btn btn-outline-warning" th:href="@{'/meeting/' + ${meeting.path} + '/leave'}">
                         모임 탈퇴
                     </a>
@@ -290,7 +310,8 @@
                         <i class="fa fa-tag"></i> <span th:text="${tag.title}">Tag</span>
                     </a>
                 </span>
-                <span th:each="zone: ${meeting.zones}" class="font-weight-light text-monospace badge badge-primary mr-3">
+                <span th:each="zone: ${meeting.zones}"
+                      class="font-weight-light text-monospace badge badge-primary mr-3">
                     <a th:href="@{'/search/zone/' + ${zone.id}}" class="text-decoration-none text-white">
                         <i class="fa fa-globe"></i> <span th:text="${zone.localNameOfCity}">City</span>
                     </a>
@@ -389,6 +410,7 @@
         var meetingPath = "[(${meeting.path})]";
 
         function tagRequest(url, tagTitle) {
+            console.log("test");
             $.ajax({
                 dataType: "json",
                 autocomplete: {
@@ -397,19 +419,24 @@
                 },
                 contentType: "application/json; charset=utf-8",
                 method: "POST",
-                url: "/meeting/" + meetingPath + "/settings/tags" + url,
+                // url: "/meeting/" + meetingPath + "/settings/tags" + url,
+                url: "/settings/tags" + url,
                 data: JSON.stringify({'tagTitle': tagTitle})
             }).done(function (data, status) {
                 console.log("${data} and status is ${status}");
             });
+            console.log("test");
         }
 
         function onAdd(e) {
             tagRequest("/add", e.detail.data.value);
+            console.log("add");
+
         }
 
         function onRemove(e) {
             tagRequest("/remove", e.detail.data.value);
+            console.log("remove");
         }
 
         var tagInput = document.querySelector("#tags");
@@ -425,7 +452,6 @@
         // add a class to Tagify's input element
         tagify.DOM.input.classList.add('form-control');
         // re-place Tagify's input element outside of the  element (tagify.DOM.scope), just before it
-        tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
     });
 
 </script>
@@ -463,6 +489,7 @@
                 pattern: /^.{0,20}$/,
                 whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
                 dropdown: {
+                    position: "input",
                     enabled: 1, // suggest tags after a single character input
                 } // map tags
             });
@@ -470,8 +497,6 @@
             tagify.on("remove", onRemove);
             // add a class to Tagify's input element
             tagify.DOM.input.classList.add('form-control');
-            // re-place Tagify's input element outside of the  element (tagify.DOM.scope), just before it
-            tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
         });
 
     </script>
@@ -480,49 +505,50 @@
 <div th:fragment="update-zones (baseUrl)">
     <script src="/node/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
     <script type="application/javascript">
-        $(function () {
-            function tagRequest(url, zoneName) {
-                $.ajax({
-                    dataType: "json",
-                    autocomplete: {
-                        enabled: true,
-                        rightKey: true,
-                    },
-                    contentType: "application/json; charset=utf-8",
-                    method: "POST",
-                    url: "[(${baseUrl})]" + url,
-                    data: JSON.stringify({'zoneName': zoneName})
-                }).done(function (data, status) {
-                    console.log("${data} and status is ${status}");
-                });
-            }
-
-            function onAdd(e) {
-                tagRequest("/add", e.detail.data.value);
-            }
-
-            function onRemove(e) {
-                tagRequest("/remove", e.detail.data.value);
-            }
-
-            var tagInput = document.querySelector("#zones");
-
-            var tagify = new Tagify(tagInput, {
-                enforceWhitelist: true,
-                whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
-                dropdown: {
-                    enabled: 1, // suggest tags after a single character input
-                } // map tags
-            });
-
-            tagify.on("add", onAdd);
-            tagify.on("remove", onRemove);
-
-            // add a class to Tagify's input element
-            tagify.DOM.input.classList.add('form-control');
-            // re-place Tagify's input element outside of the  element (tagify.DOM.scope), just before it
-            tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
-        });
+        // $(function () {
+        //     function tagRequest(url, zoneName) {
+        //         $.ajax({
+        //             dataType: "json",
+        //             autocomplete: {
+        //                 enabled: true,
+        //                 rightKey: true,
+        //             },
+        //             contentType: "application/json; charset=utf-8",
+        //             method: "POST",
+        //             url: "[(${baseUrl})]" + url,
+        //             data: JSON.stringify({'zoneName': zoneName})
+        //         }).done(function (data, status) {
+        //             console.log("${data} and status is ${status}");
+        //         });
+        //     }
+        //
+        //     function onAdd(e) {
+        //         tagRequest("/add", e.detail.data.value);
+        //     }
+        //
+        //     function onRemove(e) {
+        //         tagRequest("/remove", e.detail.data.value);
+        //     }
+        //
+        //     var tagInput = document.querySelector("#zones");
+        //
+        //     var tagify = new Tagify(tagInput, {
+        //         enforceWhitelist: true,
+        //         whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
+        //         dropdown: {
+        //             enabled: 1, // suggest tags after a single character input
+        //         } // map tags
+        //     });
+        //
+        //     tagify.on("add", onAdd);
+        //     tagify.on("remove", onRemove);
+        //
+        //     // add a class to Tagify's input element
+        //     tagify.DOM.input.classList.add('form-control');
+        //     // re-place Tagify's input element outside of the  element (tagify.DOM.scope), just before it
+        //     tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
+        //     console.log("test");
+        // });
 
     </script>
 </div>
@@ -676,44 +702,44 @@
     </a>
 </ul>
 
-<div th:fragment="meeting-list (meetingList)" class="col-sm-12">
-    <div class="row">
-        <div class="col-md-4" th:each="meeting: ${meetingList}">
-            <div class="card mb-4 shadow-sm">
-                <img th:src="${meeting.image}" class="card-img-top" th:alt="${meeting.title}">
-                <div class="card-body">
-                    <a th:href="@{'/meeting/' + ${meeting.path}}" class="text-decoration-none">
-                        <h5 class="card-title context" th:text="${meeting.title}"></h5>
-                    </a>
-                    <p class="card-text" th:text="${meeting.shortDescription}">Short description</p>
-                    <p class="card-text context">
-                                <span th:each="tag: ${meeting.tags}"
-                                      class="font-weight-light text-monospace badge badge-pill badge-info mr-3">
-                                    <a th:href="@{'/search/tag/' + ${tag.title}}"
-                                       class="text-decoration-none text-white">
-                                        <i class="fa fa-tag"></i> <span th:text="${tag.title}">Tag</span>
-                                    </a>
-                                </span>
-                        <span th:each="zone: ${meeting.zones}"
-                              class="font-weight-light text-monospace badge badge-primary mr-3">
-                                    <a th:href="@{'/search/zone/' + ${zone.id}}"
-                                       class="text-decoration-none text-white">
-                                        <i class="fa fa-globe"></i> <span th:text="${zone.localNameOfCity}"
-                                                                          class="text-white">City</span>
-                                    </a>
-                                </span>
-                    </p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            <i class="fa fa-user-circle"></i>
-                            <span th:text="${meeting.memberCount}"></span>명
-                        </small>
-                        <small class="text-muted date" th:text="${meeting.publishedDateTime}">9 mins</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<!--<div th:fragment="meeting-list (meetingList)" class="col-sm-12">-->
+<!--    <div class="row">-->
+<!--        <div class="col-md-4" th:each="meeting: ${meetingList}">-->
+<!--            <div class="card mb-4 shadow-sm">-->
+<!--                <img th:src="${meeting.image}" class="card-img-top" th:alt="${meeting.title}">-->
+<!--                <div class="card-body">-->
+<!--                    <a th:href="@{'/meeting/' + ${meeting.path}}" class="text-decoration-none">-->
+<!--                        <h5 class="card-title context" th:text="${meeting.title}"></h5>-->
+<!--                    </a>-->
+<!--                    <p class="card-text" th:text="${meeting.shortDescription}">Short description</p>-->
+<!--                    <p class="card-text context">-->
+<!--                                <span th:each="tag: ${meeting.tags}"-->
+<!--                                      class="font-weight-light text-monospace badge badge-pill badge-info mr-3">-->
+<!--                                    <a th:href="@{'/search/tag/' + ${tag.title}}"-->
+<!--                                       class="text-decoration-none text-white">-->
+<!--                                        <i class="fa fa-tag"></i> <span th:text="${tag.title}">Tag</span>-->
+<!--                                    </a>-->
+<!--                                </span>-->
+<!--                        <span th:each="zone: ${meeting.zones}"-->
+<!--                              class="font-weight-light text-monospace badge badge-primary mr-3">-->
+<!--                                    <a th:href="@{'/search/zone/' + ${zone.id}}"-->
+<!--                                       class="text-decoration-none text-white">-->
+<!--                                        <i class="fa fa-globe"></i> <span th:text="${zone.localNameOfCity}"-->
+<!--                                                                          class="text-white">City</span>-->
+<!--                                    </a>-->
+<!--                                </span>-->
+<!--                    </p>-->
+<!--                    <div class="d-flex justify-content-between align-items-center">-->
+<!--                        <small class="text-muted">-->
+<!--                            <i class="fa fa-user-circle"></i>-->
+<!--                            <span th:text="${meeting.memberCount}"></span>명-->
+<!--                        </small>-->
+<!--                        <small class="text-muted date" th:text="${meeting.publishedDateTime}">9 mins</small>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 
 </html>

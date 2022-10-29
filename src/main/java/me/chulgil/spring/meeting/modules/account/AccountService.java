@@ -10,6 +10,7 @@ import me.chulgil.spring.meeting.modules.account.form.Notifications;
 import me.chulgil.spring.meeting.modules.account.form.Profile;
 import me.chulgil.spring.meeting.modules.account.form.SignUpForm;
 import me.chulgil.spring.meeting.modules.account.validator.AccountRepository;
+import me.chulgil.spring.meeting.modules.tag.Tag;
 import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,6 +28,8 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -183,4 +186,15 @@ public class AccountService implements UserDetailsService {
                 .build();
         emailService.sendEmail(emailMessage);
     }
+
+    public void addTag(Account account, Tag tag) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        byId.ifPresent(a -> a.getTags().add(tag));
+    }
+
+    public Set<Tag> getTags(Account account) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        return byId.orElseThrow().getTags();
+    }
+
 }

@@ -1,5 +1,7 @@
 package me.chulgil.spring.meeting.modules.account;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import me.chulgil.spring.meeting.modules.account.domain.Account;
 import me.chulgil.spring.meeting.modules.account.form.NicknameForm;
@@ -8,7 +10,11 @@ import me.chulgil.spring.meeting.modules.account.form.PasswordForm;
 import me.chulgil.spring.meeting.modules.account.form.Profile;
 import me.chulgil.spring.meeting.modules.account.validator.PasswordValidator;
 import me.chulgil.spring.meeting.modules.main.CurrentUser;
+import me.chulgil.spring.meeting.modules.tag.Tag;
+import me.chulgil.spring.meeting.modules.tag.TagForm;
+import me.chulgil.spring.meeting.modules.tag.TagRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -17,6 +23,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static me.chulgil.spring.meeting.modules.account.SettingsController.ROOT;
 import static me.chulgil.spring.meeting.modules.account.SettingsController.SETTINGS;
@@ -34,15 +43,45 @@ public class SettingsController {
     static final String PASSWORD = "/password";
     static final String NOTIFICATIONS = "/notifications";
     static final String ACCOUNT = "/account";
+    static final String TAGS = "/tags";
 
     private final AccountService accountService;
 
     private final ModelMapper modelMapper;
 
+    private final TagRepository tagRepository;
+
+    private final ObjectMapper objectMapper;
 
     @InitBinder("passwordForm")
     public void initBinder(WebDataBinder webDataBinder) {
         webDataBinder.addValidators(new PasswordValidator());
+    }
+
+
+    @GetMapping(TAGS)
+    public String updateTags(@CurrentUser Account account, Model model) throws JsonProcessingException {
+        model.addAttribute(account);
+        Set<Tag> tags = accountService.getTags(account);
+        model.addAttribute("tags", tags.stream().map(Tag::getTitle).collect(Collectors.toList()));
+
+        List<String> allTags = tagRepository.findAll().stream().map(Tag::getTitle).collect(Collectors.toList());
+        model.addAttribute("whitelist", objectMapper.writeValueAsString(allTags));
+
+        return SETTINGS + TAGS;
+    }
+
+
+    @PostMapping(TAGS + "/add")
+    @ResponseBody
+    public ResponseEntity addTag(@CurrentUser Account account, @RequestBody TagForm tagForm) {
+        String title = tagForm.getTagTitle();
+        Tag tag = tagRepository.findByTitle(title);
+        if (tag == null) {
+            tag = tagRepository.save(Tag.builder().title(title).build());
+        }
+        accountService.addTag(account, tag);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping(PROFILE)
@@ -128,7 +167,7 @@ public class SettingsController {
 
     @PostMapping(ACCOUNT)
     public String updateAccount(@CurrentUser Account account, @Valid NicknameForm nickNameForm, Errors errors,
-                                    Model model, RedirectAttributes attributes) {
+                                Model model, RedirectAttributes attributes) {
         if (errors.hasErrors()) {
             model.addAttribute(account);
             return SETTINGS + ACCOUNT;
