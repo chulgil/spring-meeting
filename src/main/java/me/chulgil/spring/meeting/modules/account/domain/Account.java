@@ -5,6 +5,7 @@ import me.chulgil.spring.meeting.modules.tag.Tag;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -47,19 +48,19 @@ public class Account {
 
     private boolean createdByEmail;
 
-    private boolean createdByWeb;
-    private boolean updatedByWeb;
+    private boolean createdByWeb = true;
+    private boolean updatedByWeb = true;
 
-    private boolean enrollmentByEmail;
+    private boolean enrollmentByEmail = false;
 
-    private boolean enrollmentByWeb;
+    private boolean enrollmentByWeb = true;
 
-    private boolean notifyByEmail;
+    private boolean notifyByEmail = false;
 
-    private boolean notifyByWeb;
+    private boolean notifyByWeb = true;
 
     @ManyToMany
-    private Set<Tag> tags;
+    private Set<Tag> tags = new HashSet<>();
 
     public void generateEmailCheckToken() {
         this.emailCheckToken = UUID.randomUUID().toString();
