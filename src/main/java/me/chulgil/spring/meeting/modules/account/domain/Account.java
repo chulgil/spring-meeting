@@ -2,6 +2,7 @@ package me.chulgil.spring.meeting.modules.account.domain;
 
 import lombok.*;
 import me.chulgil.spring.meeting.modules.tag.Tag;
+import me.chulgil.spring.meeting.modules.zone.Zone;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -61,6 +62,9 @@ public class Account {
 
     @ManyToMany
     private Set<Tag> tags = new HashSet<>();
+
+    @ManyToMany
+    private Set<Zone> zones = new HashSet<>();
 
     public void generateEmailCheckToken() {
         this.emailCheckToken = UUID.randomUUID().toString();

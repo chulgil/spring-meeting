@@ -11,6 +11,8 @@ import me.chulgil.spring.meeting.modules.account.form.Profile;
 import me.chulgil.spring.meeting.modules.account.form.SignUpForm;
 import me.chulgil.spring.meeting.modules.account.validator.AccountRepository;
 import me.chulgil.spring.meeting.modules.tag.Tag;
+import me.chulgil.spring.meeting.modules.zone.Zone;
+import me.chulgil.spring.meeting.modules.zone.ZoneRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -36,6 +38,8 @@ import java.util.Set;
 @Transactional
 public class AccountService implements UserDetailsService {
     private final AccountRepository accountRepository;
+    private final ZoneRepository zoneRepository;
+
     private final JavaMailSender mail;
     private final PasswordEncoder passwordEncoder;
 
@@ -191,5 +195,20 @@ public class AccountService implements UserDetailsService {
     public void removeTag(Account account, Tag tag) {
         Optional<Account> byId = accountRepository.findById(account.getId());
         byId.ifPresent(t -> t.getTags().remove(tag));
+    }
+
+    public Set<Zone> getZones(Account account) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        return byId.orElseThrow().getZones();
+    }
+
+    public void addZone(Account account, Zone zone) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        byId.ifPresent(a -> a.getZones().add(zone));
+    }
+
+    public void removeZone(Account account, Zone zone) {
+        Optional<Account> byId = accountRepository.findById(account.getId());
+        byId.ifPresent(a -> a.getZones().remove(zone));
     }
 }
