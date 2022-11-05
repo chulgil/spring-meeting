@@ -69,11 +69,13 @@ class SettingsControllerTest {
         signUpForm.setPassword("password");
         //accountService.processNewAccount(signUp);
         System.out.println("========================Before");
+        zoneRepository.save(testZone);
     }
 
     @AfterEach
     void afterEach() {
         accountRepository.deleteAll();
+        zoneRepository.deleteAll();
     }
 
     //@WithUserDetails("cglee") // @BeforeEach보다 먼저 실행됨 (사용할수없음)

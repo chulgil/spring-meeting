@@ -688,55 +688,55 @@
     </div>
 </div>
 
-<ul th:fragment="notification-list (notifications)" class="list-group list-group-flush">
-    <a href="#" th:href="@{${noti.link}}" th:each="noti: ${notifications}"
-       class="list-group-item list-group-item-action">
-        <div class="d-flex w-100 justify-content-between">
-            <small class="text-muted" th:text="${noti.title}">Noti title</small>
-            <small class="fromNow text-muted" th:text="${noti.createdDateTime}">3 days ago</small>
-        </div>
-        <p th:text="${noti.message}" class="text-left mb-0 mt-1">message</p>
-    </a>
-</ul>
-
-<!--<div th:fragment="meeting-list (meetingList)" class="col-sm-12">-->
-<!--    <div class="row">-->
-<!--        <div class="col-md-4" th:each="meeting: ${meetingList}">-->
-<!--            <div class="card mb-4 shadow-sm">-->
-<!--                <img th:src="${meeting.image}" class="card-img-top" th:alt="${meeting.title}">-->
-<!--                <div class="card-body">-->
-<!--                    <a th:href="@{'/meeting/' + ${meeting.path}}" class="text-decoration-none">-->
-<!--                        <h5 class="card-title context" th:text="${meeting.title}"></h5>-->
-<!--                    </a>-->
-<!--                    <p class="card-text" th:text="${meeting.shortDescription}">Short description</p>-->
-<!--                    <p class="card-text context">-->
-<!--                                <span th:each="tag: ${meeting.tags}"-->
-<!--                                      class="font-weight-light text-monospace badge badge-pill badge-info mr-3">-->
-<!--                                    <a th:href="@{'/search/tag/' + ${tag.title}}"-->
-<!--                                       class="text-decoration-none text-white">-->
-<!--                                        <i class="fa fa-tag"></i> <span th:text="${tag.title}">Tag</span>-->
-<!--                                    </a>-->
-<!--                                </span>-->
-<!--                        <span th:each="zone: ${meeting.zones}"-->
-<!--                              class="font-weight-light text-monospace badge badge-primary mr-3">-->
-<!--                                    <a th:href="@{'/search/zone/' + ${zone.id}}"-->
-<!--                                       class="text-decoration-none text-white">-->
-<!--                                        <i class="fa fa-globe"></i> <span th:text="${zone.localNameOfCity}"-->
-<!--                                                                          class="text-white">City</span>-->
-<!--                                    </a>-->
-<!--                                </span>-->
-<!--                    </p>-->
-<!--                    <div class="d-flex justify-content-between align-items-center">-->
-<!--                        <small class="text-muted">-->
-<!--                            <i class="fa fa-user-circle"></i>-->
-<!--                            <span th:text="${meeting.memberCount}"></span>명-->
-<!--                        </small>-->
-<!--                        <small class="text-muted date" th:text="${meeting.publishedDateTime}">9 mins</small>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
+<!--<ul th:fragment="notification-list (notifications)" class="list-group list-group-flush">-->
+<!--    <a href="#" th:href="@{${noti.link}}" th:each="noti: ${notifications}"-->
+<!--       class="list-group-item list-group-item-action">-->
+<!--        <div class="d-flex w-100 justify-content-between">-->
+<!--            <small class="text-muted" th:text="${noti.title}">Noti title</small>-->
+<!--            <small class="fromNow text-muted" th:text="${noti.createdDateTime}">3 days ago</small>-->
 <!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
+<!--        <p th:text="${noti.message}" class="text-left mb-0 mt-1">message</p>-->
+<!--    </a>-->
+<!--</ul>-->
+
+<div th:fragment="meeting-list (meetingList)" class="col-sm-12">
+    <div class="row">
+        <div class="col-md-4" th:each="meeting: ${meetingList}">
+            <div class="card mb-4 shadow-sm">
+                <img th:src="${meeting.image}" class="card-img-top" th:alt="${meeting.title}">
+                <div class="card-body">
+                    <a th:href="@{'/meeting/' + ${meeting.path}}" class="text-decoration-none">
+                        <h5 class="card-title context" th:text="${meeting.title}"></h5>
+                    </a>
+                    <p class="card-text" th:text="${meeting.shortDescription}">Short description</p>
+                    <p class="card-text context">
+                                <span th:each="tag: ${meeting.tags}"
+                                      class="font-weight-light text-monospace badge badge-pill badge-info mr-3">
+                                    <a th:href="@{'/search/tag/' + ${tag.title}}"
+                                       class="text-decoration-none text-white">
+                                        <i class="fa fa-tag"></i> <span th:text="${tag.title}">Tag</span>
+                                    </a>
+                                </span>
+                        <span th:each="zone: ${meeting.zones}"
+                              class="font-weight-light text-monospace badge badge-primary mr-3">
+                                    <a th:href="@{'/search/zone/' + ${zone.id}}"
+                                       class="text-decoration-none text-white">
+                                        <i class="fa fa-globe"></i> <span th:text="${zone.localNameOfCity}"
+                                                                          class="text-white">City</span>
+                                    </a>
+                                </span>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fa fa-user-circle"></i>
+                            <span th:text="${meeting.memberCount}"></span>명
+                        </small>
+                        <small class="text-muted date" th:text="${meeting.publishedDateTime}">9 mins</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 </html>

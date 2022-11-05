@@ -1,6 +1,7 @@
 package me.chulgil.spring.meeting.modules.account;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import me.chulgil.spring.meeting.infra.config.AppProperties;
 import me.chulgil.spring.meeting.infra.mail.EmailMessage;
 import me.chulgil.spring.meeting.infra.mail.EmailService;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
