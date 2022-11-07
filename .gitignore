@@ -153,3 +153,4 @@ src/main/resources/static/node
 target/*
 
 -*.properties
+*.properties
