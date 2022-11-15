@@ -6,38 +6,38 @@
 
 <div class="container">
     <div class="py-5 text-center">
-        <h2>미팅 개설</h2>
+        <h2>아젠다 개설</h2>
     </div>
     <div class="row justify-content-center">
         <form class="needs-validation col-sm-10" th:action="@{/new-meeting}" th:object="${meetingForm}" method="post" novalidate>
             <div class="form-group">
-                <label for="path">미팅 URL</label>
+                <label for="path">아젠다 URL</label>
                 <input id="path" type="text" th:field="*{path}" class="form-control"
                        placeholder="예) meeting-path" aria-describedby="pathHelp" required min="2" max="20">
                 <small id="pathHelp" class="form-text text-muted">
-                    공백없이 문자, 숫자, 대시(-)와 언더바(_)만 2자 이상 20자 이내로 입력하세요. 미팅 홈 주소에 사용합니다. 예) /meeting/<b>meeting-path</b>
+                    공백없이 문자, 숫자, 대시(-)와 언더바(_)만 2자 이상 20자 이내로 입력하세요. 아젠다 홈 주소에 사용합니다. 예) /meeting/<b>meeting-path</b>
                 </small>
-                <small class="invalid-feedback">미팅 경로를 입력하세요.</small>
+                <small class="invalid-feedback">아젠다 경로를 입력하세요.</small>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('path')}" th:errors="*{path}">Path Error</small>
             </div>
 
             <div class="form-group">
-                <label for="title">미팅 이름</label>
+                <label for="title">아젠다 이름</label>
                 <input id="title" type="text" th:field="*{title}" class="form-control"
-                       placeholder="미팅 이름" aria-describedby="titleHelp" required max="50">
+                       placeholder="아젠다 이름" aria-describedby="titleHelp" required max="50">
                 <small id="titleHelp" class="form-text text-muted">
-                    미팅 이름을 50자 이내로 입력하세요.
+                    아젠다 이름을 50자 이내로 입력하세요.
                 </small>
-                <small class="invalid-feedback">미팅 이름을 입력하세요.</small>
+                <small class="invalid-feedback">아젠다 이름을 입력하세요.</small>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title Error</small>
             </div>
 
             <div class="form-group">
                 <label for="shortDescription">짧은 소개</label>
                 <textarea id="shortDescription" type="textarea" th:field="*{shortDescription}" class="form-control"
-                          placeholder="미팅를 짧게 소개해 주세요." aria-describedby="shortDescriptionHelp" required maxlength="100"></textarea>
+                          placeholder="아젠다를 짧게 소개해 주세요." aria-describedby="shortDescriptionHelp" required maxlength="100"></textarea>
                 <small id="shortDescriptionHelp" class="form-text text-muted">
-                    100자 이내로 미팅를 짧은 소개해 주세요.
+                    100자 이내로 아젠다를 짧은 소개해 주세요.
                 </small>
                 <small class="invalid-feedback">짧은 소개를 입력하세요.</small>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('shortDescription')}" th:errors="*{shortDescription}">ShortDescription Error</small>
@@ -46,9 +46,9 @@
             <div class="form-group">
                 <label for="fullDescription">상세 소개</label>
                 <textarea id="fullDescription" type="textarea" th:field="*{fullDescription}" class="editor form-control"
-                          placeholder="미팅를 자세히 설명해 주세요." aria-describedby="fullDescriptionHelp" required></textarea>
+                          placeholder="아젠다를 자세히 설명해 주세요." aria-describedby="fullDescriptionHelp" required></textarea>
                 <small id="fullDescriptionHelp" class="form-text text-muted">
-                    미팅의 목표, 일정, 진행 방식, 사용할 교재 또는 인터넷 강좌 그리고 모집중인 참여자 등 미팅에 대해 자세히 적어 주세요.
+                    아젠다의 목표, 일정, 진행 방식, 사용할 교재 또는 인터넷 강좌 그리고 모집중인 참여자 등 아젠다에 대해 자세히 적어 주세요.
                 </small>
                 <small class="invalid-feedback">상세 소개를 입력하세요.</small>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('fullDescription')}" th:errors="*{fullDescription}">FullDescription Error</small>
@@ -56,7 +56,7 @@
 
             <div class="form-group">
                 <button class="btn btn-primary btn-block" type="submit"
-                        aria-describedby="submitHelp">미팅 만들기</button>
+                        aria-describedby="submitHelp">아젠다 만들기</button>
             </div>
         </form>
     </div>

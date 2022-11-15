@@ -19,8 +19,11 @@ public class WithAccountSecurityContextFactory implements WithSecurityContextFac
     public SecurityContext createSecurityContext(WithAccount withAccount) {
         String nickname = withAccount.value();
 
-        accountService.processNewAccount(this.createSignUp(nickname));
-
+        SignUpForm signUpForm = new SignUpForm();
+        signUpForm.setNickname(nickname);
+        signUpForm.setEmail(nickname + "@email.com");
+        signUpForm.setPassword("12345678");
+        accountService.processNewAccount(signUpForm);
 
         UserDetails principal = accountService.loadUserByUsername(nickname);
         Authentication authentication = new UsernamePasswordAuthenticationToken(principal, principal.getPassword(), principal.getAuthorities());
@@ -29,11 +32,4 @@ public class WithAccountSecurityContextFactory implements WithSecurityContextFac
         return context;
     }
 
-    private SignUpForm createSignUp(String nickname) {
-        SignUpForm signUpForm = new SignUpForm();
-        signUpForm.setNickname(nickname);
-        signUpForm.setEmail(nickname + "@test.com");
-        signUpForm.setPassword("password");
-        return signUpForm;
-    }
 }
