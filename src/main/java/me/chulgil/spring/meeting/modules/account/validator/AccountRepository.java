@@ -2,6 +2,7 @@ package me.chulgil.spring.meeting.modules.account.validator;
 
 
 import me.chulgil.spring.meeting.modules.account.domain.Account;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     Account findByNickname(String nickname);
 
+    @EntityGraph(attributePaths = {"tags", "zones"})
+    Account findWithTagsAndZonesById(Long id);
 
 }
 

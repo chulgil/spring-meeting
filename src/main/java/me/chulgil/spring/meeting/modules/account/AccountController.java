@@ -92,9 +92,6 @@ public class AccountController {
     public String viewProfile(@PathVariable String nickname, Model model, @CurrentUser Account account
     ) throws IllegalAccessException {
         Account accountToView = accountService.getAccount(nickname);
-        if (nickname == null) {
-            throw new IllegalAccessException(nickname + "에 해당하는 사용자가 없습니다.");
-        }
         model.addAttribute("account", accountToView);
         model.addAttribute("isOwner", accountToView.equals(account));
 

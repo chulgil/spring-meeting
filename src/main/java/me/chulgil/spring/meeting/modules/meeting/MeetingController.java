@@ -50,7 +50,7 @@ public class MeetingController {
     }
 
     @GetMapping("/meeting/{path}")
-    public String viewMeetingPath(@CurrentUser Account account, @PathVariable String path, Model model) {
+    public String viewMeeting(@CurrentUser Account account, @PathVariable String path, Model model) {
         Meeting meeting = meetingService.getMeeting(path);
         model.addAttribute(account);
         model.addAttribute(meeting);

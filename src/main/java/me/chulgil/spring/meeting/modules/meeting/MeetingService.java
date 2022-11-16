@@ -3,6 +3,10 @@ package me.chulgil.spring.meeting.modules.meeting;
 
 import lombok.RequiredArgsConstructor;
 import me.chulgil.spring.meeting.modules.account.domain.Account;
+import me.chulgil.spring.meeting.modules.meeting.form.MeetingDescriptionForm;
+import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MeetingService {
 
+    private final ModelMapper modelMapper;
     private final MeetingRepository meetingRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Meeting createNewMeeting(Meeting meeting, Account account) {
 
@@ -32,11 +38,29 @@ public class MeetingService {
         }
     }
 
+    private void checkIfManager(Account account, Meeting meeting) {
+        if (!meeting.isManagedBy(account)) {
+            throw new AccessDeniedException("해당 기능을 사용할 수 없습니다.");
+        }
+    }
+
     public void addMember(Meeting meeting, Account account) {
         meeting.addMember(account);
     }
 
     public void removeMember(Meeting meeting, Account account) {
         meeting.removeMember(account);
+    }
+
+    public Meeting getMeetingToUpdateZone(Account account, String path) {
+        Meeting meeting = this.meetingRepository.findMeetingWithZonesByPath(path);
+        checkIfExistingMeeting(path, meeting);
+        checkIfManager(account, meeting);
+        return meeting;
+    }
+
+    public void updateMeetingDescription(Meeting meeting, MeetingDescriptionForm descriptionForm) {
+        modelMapper.map(descriptionForm, meeting);
+        //eventPublisher.publishEvent(new MeetingUpdateEvent(meeting, "아젠다 소개를 수정했습니다."));
     }
 }
