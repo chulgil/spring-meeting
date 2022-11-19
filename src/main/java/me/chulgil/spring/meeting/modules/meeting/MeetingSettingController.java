@@ -1,5 +1,7 @@
 package me.chulgil.spring.meeting.modules.meeting;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import me.chulgil.spring.meeting.modules.account.domain.Account;
 import me.chulgil.spring.meeting.modules.main.CurrentUser;
@@ -33,6 +35,7 @@ public class MeetingSettingController {
     private final TagRepository tagRepository;
     private final TagService tagService;
     private final ModelMapper modelMapper;
+    private final ObjectMapper objectMapper;
     private final MeetingFormValidator meetingFormValidator;
 
     /**
@@ -106,14 +109,16 @@ public class MeetingSettingController {
     }
 
     @GetMapping("tags")
-    public String viewMeetingTags(@CurrentUser Account account, @PathVariable String path, Model model) {
+    public String viewMeetingTags(@CurrentUser Account account, @PathVariable String path, Model model)
+            throws JsonProcessingException {
         Meeting meeting = meetingService.getMeetingToUpdate(account, path);
         model.addAttribute(account);
         model.addAttribute(meeting);
         model.addAttribute("tags", meeting.getTags().stream()
                 .map(Tag::getTitle).collect(Collectors.toList()));
-        List<String> allTagsTitle = tagRepository.findAll().stream().map(Tag::getTitle).collect(Collectors.toList());
-        model.addAttribute("whitelist", allTagsTitle);
+        List<String> allTagsTitle = tagRepository.findAll().stream()
+                .map(Tag::getTitle).collect(Collectors.toList());
+        model.addAttribute("whitelist", objectMapper.writeValueAsString(allTagsTitle));
         return "meeting/settings/tags";
     }
 

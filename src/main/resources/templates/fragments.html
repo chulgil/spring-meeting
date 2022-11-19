@@ -403,11 +403,10 @@
 
 <script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
 <script type="application/javascript" th:inline="javascript">
-    $(function () {
-        var meetingPath = "[(${meeting.path})]";
+    $(function() {
+        let meetingPath = "[(${meeting.path})]";
 
         function tagRequest(url, tagTitle) {
-            console.log("test");
             $.ajax({
                 dataType: "json",
                 autocomplete: {
@@ -416,24 +415,19 @@
                 },
                 contentType: "application/json; charset=utf-8",
                 method: "POST",
-                // url: "/meeting/" + meetingPath + "/settings/tags" + url,
-                url: "/settings/tags" + url,
+                url: "/meeting/" + meetingPath + "/settings/tags" + url,
                 data: JSON.stringify({'tagTitle': tagTitle})
             }).done(function (data, status) {
                 console.log("${data} and status is ${status}");
             });
-            console.log("test");
         }
 
         function onAdd(e) {
             tagRequest("/add", e.detail.data.value);
-            console.log("add");
-
         }
 
         function onRemove(e) {
             tagRequest("/remove", e.detail.data.value);
-            console.log("remove");
         }
 
         var tagInput = document.querySelector("#tags");
@@ -451,7 +445,6 @@
         // re-place Tagify's input element outside of the  element (tagify.DOM.scope), just before it
         tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
     });
-
 </script>
 
 <div th:fragment="update-tags (baseUrl)">
@@ -493,8 +486,11 @@
             });
             tagify.on("add", onAdd);
             tagify.on("remove", onRemove);
+
             // add a class to Tagify's input element
             tagify.DOM.input.classList.add('form-control');
+            // re-place Tagify's input element outside of the  element (tagify.DOM.scope), just before it
+            tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
         });
 
     </script>
