@@ -5,8 +5,13 @@ import me.chulgil.spring.meeting.modules.account.domain.Account;
 import me.chulgil.spring.meeting.modules.main.CurrentUser;
 import me.chulgil.spring.meeting.modules.meeting.form.MeetingDescriptionForm;
 import me.chulgil.spring.meeting.modules.meeting.validator.MeetingFormValidator;
+import me.chulgil.spring.meeting.modules.tag.Tag;
+import me.chulgil.spring.meeting.modules.tag.TagForm;
+import me.chulgil.spring.meeting.modules.tag.TagRepository;
+import me.chulgil.spring.meeting.modules.tag.TagService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -15,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/meeting/{path}/settings")
@@ -23,6 +30,8 @@ public class MeetingSettingController {
 
     private final MeetingRepository meetingRepository;
     private final MeetingService meetingService;
+    private final TagRepository tagRepository;
+    private final TagService tagService;
     private final ModelMapper modelMapper;
     private final MeetingFormValidator meetingFormValidator;
 
@@ -96,4 +105,40 @@ public class MeetingSettingController {
         return "redirect:/meeting/" + meeting.getEncodedPath() + "/settings/banner";
     }
 
+    @GetMapping("tags")
+    public String viewMeetingTags(@CurrentUser Account account, @PathVariable String path, Model model) {
+        Meeting meeting = meetingService.getMeetingToUpdate(account, path);
+        model.addAttribute(account);
+        model.addAttribute(meeting);
+        model.addAttribute("tags", meeting.getTags().stream()
+                .map(Tag::getTitle).collect(Collectors.toList()));
+        List<String> allTagsTitle = tagRepository.findAll().stream().map(Tag::getTitle).collect(Collectors.toList());
+        model.addAttribute("whitelist", allTagsTitle);
+        return "meeting/settings/tags";
+    }
+
+    @PostMapping("/tags/add")
+    @ResponseBody
+    public ResponseEntity addTag(@CurrentUser Account account, @PathVariable String path,
+                                 @RequestBody TagForm tagForm) {
+        Meeting meeting = meetingService.getMeetingToUpdateTag(account, path);
+        Tag tag = tagService.findOrCreateNew(tagForm.getTagTitle());
+        meetingService.addTag(meeting, tag);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/tags/remove")
+    @ResponseBody
+    public ResponseEntity removeTag(@CurrentUser Account account, @PathVariable String path,
+                                    @RequestBody TagForm tagForm) {
+        Meeting meeting = meetingService.getMeetingToUpdateTag(account, path);
+        Tag tag = tagRepository.findByTitle(tagForm.getTagTitle());
+        if (tag == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        meetingService.removeTag(meeting, tag);
+        return ResponseEntity.ok().build();
+    }
+    
 }

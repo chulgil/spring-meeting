@@ -22,4 +22,7 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 
     @EntityGraph(attributePaths = "managers")
     Meeting findMeetingWithManagersByPath(String path);
+
+    @EntityGraph(attributePaths = "tags")
+    Meeting findMeetingWithTagsByPath(String path);
 }

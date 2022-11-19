@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import me.chulgil.spring.meeting.modules.account.domain.Account;
 import me.chulgil.spring.meeting.modules.meeting.event.MeetingCreatedEvent;
 import me.chulgil.spring.meeting.modules.meeting.form.MeetingDescriptionForm;
+import me.chulgil.spring.meeting.modules.tag.Tag;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
@@ -17,18 +18,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class MeetingService {
 
     private final ModelMapper modelMapper;
-    private final MeetingRepository meetingRepository;
+    private final MeetingRepository repository;
     private final ApplicationEventPublisher eventPublisher;
 
     public Meeting createNewMeeting(Meeting meeting, Account account) {
 
-        Meeting newMeeting = meetingRepository.save(meeting);
+        Meeting newMeeting = repository.save(meeting);
         newMeeting.addManager(account);
         return newMeeting;
     }
 
     public Meeting getMeeting(String path) {
-        Meeting meeting = this.meetingRepository.findByPath(path);
+        Meeting meeting = this.repository.findByPath(path);
         checkIfExistingMeeting(path, meeting);
         return meeting;
     }
@@ -60,7 +61,7 @@ public class MeetingService {
     }
 
     public Meeting getMeetingToUpdateZone(Account account, String path) {
-        Meeting meeting = this.meetingRepository.findMeetingWithZonesByPath(path);
+        Meeting meeting = this.repository.findMeetingWithZonesByPath(path);
         checkIfExistingMeeting(path, meeting);
         checkIfManager(account, meeting);
         return meeting;
@@ -72,7 +73,7 @@ public class MeetingService {
     }
 
     public Meeting getMeetingToUpdateStatus(Account account, String path) {
-        Meeting meeting = this.meetingRepository.findMeetingWithManagersByPath(path);
+        Meeting meeting = this.repository.findMeetingWithManagersByPath(path);
         checkIfExistingMeeting(path, meeting);
         checkIfManager(account, meeting);
         return meeting;
@@ -94,4 +95,20 @@ public class MeetingService {
     public void updateMeetingImage(Meeting meeting, String image) {
         meeting.setImage(image);
     }
+
+    public Meeting getMeetingToUpdateTag(Account account, String path) {
+        Meeting meeting = repository.findMeetingWithTagsByPath(path);
+        checkIfExistingMeeting(path, meeting);
+        checkIfManager(account, meeting);
+        return meeting;
+    }
+
+    public void addTag(Meeting meeting, Tag tag) {
+        meeting.getTags().add(tag);
+    }
+
+    public void removeTag(Meeting meeting, Tag tag) {
+        meeting.getTags().add(tag);
+    }
+{}
 }
