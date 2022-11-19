@@ -3,6 +3,7 @@ package me.chulgil.spring.meeting.modules.meeting;
 
 import lombok.RequiredArgsConstructor;
 import me.chulgil.spring.meeting.modules.account.domain.Account;
+import me.chulgil.spring.meeting.modules.meeting.event.MeetingCreatedEvent;
 import me.chulgil.spring.meeting.modules.meeting.form.MeetingDescriptionForm;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,6 +30,12 @@ public class MeetingService {
     public Meeting getMeeting(String path) {
         Meeting meeting = this.meetingRepository.findByPath(path);
         checkIfExistingMeeting(path, meeting);
+        return meeting;
+    }
+
+    public Meeting getMeetingToUpdate(Account account, String path) {
+        Meeting meeting = this.getMeeting(path);
+        checkIfManager(account, meeting);
         return meeting;
     }
 
@@ -62,5 +69,29 @@ public class MeetingService {
     public void updateMeetingDescription(Meeting meeting, MeetingDescriptionForm descriptionForm) {
         modelMapper.map(descriptionForm, meeting);
         //eventPublisher.publishEvent(new MeetingUpdateEvent(meeting, "아젠다 소개를 수정했습니다."));
+    }
+
+    public Meeting getMeetingToUpdateStatus(Account account, String path) {
+        Meeting meeting = this.meetingRepository.findMeetingWithManagersByPath(path);
+        checkIfExistingMeeting(path, meeting);
+        checkIfManager(account, meeting);
+        return meeting;
+    }
+
+    public void publish(Meeting meeting) {
+        meeting.publish();
+        this.eventPublisher.publishEvent(new MeetingCreatedEvent(meeting));
+    }
+
+    public void disableMeetingBanner(Meeting meeting) {
+        meeting.setUseBanner(false);
+    }
+
+    public void enableMeetingBanner(Meeting meeting) {
+        meeting.setUseBanner(true);
+    }
+
+    public void updateMeetingImage(Meeting meeting, String image) {
+        meeting.setImage(image);
     }
 }

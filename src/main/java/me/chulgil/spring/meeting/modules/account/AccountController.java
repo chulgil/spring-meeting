@@ -103,7 +103,7 @@ public class AccountController {
         return "account/email-login";
     }
 
-    @PostMapping("/email-login")
+    @PostMapping("email-login")
     public String sendEmailLoginLink(String email, Model model, RedirectAttributes attributes) {
         Account account = accountRepository.findByEmail(email);
         if (account == null) {

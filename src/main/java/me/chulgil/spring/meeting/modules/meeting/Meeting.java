@@ -105,4 +105,13 @@ public class Meeting {
     public String getEncodedPath() {
         return URLEncoder.encode(this.path, StandardCharsets.UTF_8);
     }
+
+    public void publish() {
+        if (this.closed || this.published) {
+            throw new RuntimeException("스터디를 공개할 수 없는 상태입니다. 스터디를 이미 공개했거나 종료했습니다.");
+        }
+
+        this.published = true;
+        this.publishedDateTime = LocalDateTime.now();
+    }
 }

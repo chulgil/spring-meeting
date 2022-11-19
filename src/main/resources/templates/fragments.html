@@ -6,14 +6,14 @@
 <head th:fragment="head">
     <meta charset="UTF-8">
     <title>Meeting</title>
-    <link href="https://fonts.googleapis.com/css?family=Noto+Sans+KR:300,400,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/node/node_modules/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="/node/node_modules/font-awesome/css/font-awesome.min.css"/>
-    <link rel="stylesheet" href="/node/node_modules/@yaireo/tagify/dist/tagify.css">
-    <link rel="stylesheet" href="/node/node_modules/summernote/dist/summernote-bs4.min.css">
-    <script src="/node/node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="/node/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/node/node_modules/jdenticon/dist/jdenticon.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Noto+Sans+KR:300,400,500&display=swap" >
+    <link rel="stylesheet" type="text/css" href="/node_modules/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/node_modules/font-awesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/node_modules/@yaireo/tagify/dist/tagify.css">
+    <link rel="stylesheet" type="text/css" href="/node_modules/summernote/dist/summernote-bs4.min.css">
+    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/node_modules/jdenticon/dist/jdenticon.min.js"></script>
     <style>
         .container {
             max-width: 100%;
@@ -231,7 +231,7 @@
 <script type="application/javascript" th:inline="javascript" th:fragment="ajax-csrf-header">
     // <!-- https://okky.kr/articles/487431   -->
     // 타임리프가 제공하는 자바스크립트 인라인 기능을 사용하여 구성
-    $(function () {
+    (function () {
         // 스프링시큐리티를 사용하면 _csrf.token은 항상 참조 가능하다
         // 자바스크립트의 참조를 깨뜨리지 않는 네츄럴 템플릿 방법으로 구현한다.
         var token = /*[[${_csrf.token}]]*/ null;
@@ -239,7 +239,7 @@
         $(document).ajaxSend(function (e, xhr, options) {
             xhr.setRequestHeader(header, token);
         });
-    });
+    }())
 
 </script>
 
@@ -372,16 +372,16 @@
 </div>
 
 <div th:fragment="editor-script">
-    <script src="/node/node_modules/summernote/dist/summernote-bs4.js"></script>
+    <script src="/node_modules/summernote/dist/summernote-bs4.js"></script>
     <script type="application/javascript">
-        $(function () {
+        (function () {
             $('.editor').summernote({
                 fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Noto Sans KR', 'Merriweather'],
                 placeholder: '모임의 목표, 일정, 진행 방식, 사용할 교재 또는 인터넷 강좌 그리고 모집중인 모임원 등 모임에 대해 자세히 적어 주세요.',
                 tabsize: 2,
                 height: 300
             });
-        });
+        }())
 
     </script>
 </div>
@@ -394,14 +394,14 @@
 </div>
 
 <script th:fragment="tooltip" type="application/javascript">
-    $(function () {
+    (function () {
         $('[data-toggle="tooltip"]').tooltip()
-    })
+    }())
 
 </script>
 
 
-<script src="/node/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
+<script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
 <script type="application/javascript" th:inline="javascript">
     $(function () {
         var meetingPath = "[(${meeting.path})]";
@@ -454,7 +454,7 @@
 </script>
 
 <div th:fragment="update-tags (baseUrl)">
-    <script src="/node/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
+    <script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
     <script type="application/javascript" th:inline="javascript">
         $(function () {
             function tagRequest(url, tagTitle) {
@@ -500,7 +500,7 @@
 </div>
 
 <div th:fragment="update-zones (baseUrl)">
-    <script src="/node/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
+    <script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
     <script type="application/javascript">
         $(function () {
             function tagRequest(url, zoneName) {
@@ -548,7 +548,7 @@
 </div>
 
 <div th:fragment="date-time">
-    <script src="/node/node_modules/moment/min/moment-with-locales.min.js"></script>
+    <script src="/node_modules/moment/min/moment-with-locales.min.js"></script>
     <script type="application/javascript">
         $(function () {
             moment.locale('ko');
