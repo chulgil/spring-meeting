@@ -6,11 +6,14 @@ import me.chulgil.spring.meeting.modules.account.domain.Account;
 import me.chulgil.spring.meeting.modules.meeting.event.MeetingCreatedEvent;
 import me.chulgil.spring.meeting.modules.meeting.form.MeetingDescriptionForm;
 import me.chulgil.spring.meeting.modules.tag.Tag;
+import me.chulgil.spring.meeting.modules.zone.Zone;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static me.chulgil.spring.meeting.modules.meeting.form.MeetingForm.VALID_PATH_PATTERN;
 
 @Service
 @RequiredArgsConstructor
@@ -72,15 +75,20 @@ public class MeetingService {
         //eventPublisher.publishEvent(new MeetingUpdateEvent(meeting, "아젠다 소개를 수정했습니다."));
     }
 
-    public Meeting getMeetingToUpdateStatus(Account account, String path) {
+    public Meeting getMeetingWithManager(Account account, String path) {
         Meeting meeting = this.repository.findMeetingWithManagersByPath(path);
         checkIfExistingMeeting(path, meeting);
         checkIfManager(account, meeting);
         return meeting;
     }
 
-    public void publish(Meeting meeting) {
-        meeting.publish();
+    public void enable(Meeting meeting) {
+        meeting.publish(true);
+        this.eventPublisher.publishEvent(new MeetingCreatedEvent(meeting));
+    }
+
+    public void disable(Meeting meeting) {
+        meeting.publish(false);
         this.eventPublisher.publishEvent(new MeetingCreatedEvent(meeting));
     }
 
@@ -108,7 +116,48 @@ public class MeetingService {
     }
 
     public void removeTag(Meeting meeting, Tag tag) {
-        meeting.getTags().add(tag);
+        meeting.getTags().remove(tag);
     }
-{}
+
+    public void removeZone(Meeting meeting, Zone zone) {
+        meeting.getZones().remove(zone);
+    }
+
+    public void addZone(Meeting meeting, Zone zone) {
+        meeting.getZones().add(zone);
+    }
+
+    public void enableRecruit(Meeting meeting) {
+        meeting.setRecruiting(true);
+    }
+    public void disableRecruit(Meeting meeting) {
+        meeting.setRecruiting(false);
+    }
+
+    public boolean isValidPath(String newPath) {
+        if (!newPath.matches(VALID_PATH_PATTERN)) {
+            return false;
+        }
+        return !repository.existsByPath(newPath);
+    }
+
+    public void updateMeetingPath(Meeting meeting, String newPath) {
+        meeting.setPath(newPath);
+    }
+
+    public boolean isValidTitle(String newTitle) {
+        return newTitle.length() <= 50;
+    }
+
+    public void updateMeetingTitle(Meeting meeting, String newTitle) {
+        meeting.setTitle(newTitle);
+    }
+
+    public void remove(Meeting meeting) {
+        if (meeting.isRemovable()) {
+            repository.delete(meeting);
+        } else {
+            throw new IllegalArgumentException("이미 활성화된 모임은 삭제할 수 없습니다.");
+        }
+    }
 }

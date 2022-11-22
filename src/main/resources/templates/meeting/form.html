@@ -9,7 +9,7 @@
         <h2>아젠다 개설</h2>
     </div>
     <div class="row justify-content-center">
-        <form class="needs-validation col-sm-10" th:action="@{/new-meeting}" th:object="${meetingForm}" method="post" novalidate>
+        <form class="needs-validation col-sm-10" th:action="@{/meeting/new}" th:object="${meetingForm}" method="post" novalidate>
             <div class="form-group">
                 <label for="path">아젠다 URL</label>
                 <input id="path" type="text" th:field="*{path}" class="form-control"

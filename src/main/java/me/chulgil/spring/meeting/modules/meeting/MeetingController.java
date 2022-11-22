@@ -2,7 +2,7 @@ package me.chulgil.spring.meeting.modules.meeting;
 
 import lombok.AllArgsConstructor;
 import me.chulgil.spring.meeting.modules.account.domain.Account;
-import me.chulgil.spring.meeting.modules.main.CurrentUser;
+import me.chulgil.spring.meeting.modules.main.CurrentAccount;
 import me.chulgil.spring.meeting.modules.meeting.form.MeetingForm;
 import me.chulgil.spring.meeting.modules.meeting.validator.MeetingFormValidator;
 import org.modelmapper.ModelMapper;
@@ -11,24 +11,32 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+
+import static me.chulgil.spring.meeting.modules.meeting.MeetingSettingController.MEETING_URL;
+import static me.chulgil.spring.meeting.modules.meeting.MeetingSettingController.SETTINGS;
 
 @Controller
 @AllArgsConstructor
+@RequestMapping("/meeting")
 public class MeetingController {
 
     private final MeetingRepository meetingRepository;
     private final MeetingService meetingService;
     private final ModelMapper modelMapper;
     private final MeetingFormValidator meetingFormValidator;
+
+    static final String ROOT = "/";
+    static final String PATH = "/{path}";
+    static final String MEMBERS = "/members";
+    static final String MEETING = "/meeting";
+    static final String VIEW = "/view";
+    static final String FORM = "/form";
+    static final String NEW = "/new";
+
 
     /**
      * input 스트링으로 들어오는 String 데이터들의 white space를 trim해주는 역할을 한다.
@@ -52,56 +60,60 @@ public class MeetingController {
         dataBinder.addValidators(meetingFormValidator);
     }
 
-    @GetMapping("meeting")
-    public String meetingSettingForm(@CurrentUser Account account, @PathVariable String path, Model model) {
+    @GetMapping(ROOT)
+    public String meetingSettingForm(@CurrentAccount Account account, @PathVariable String path, Model model) {
         Meeting meeting = meetingService.getMeetingToUpdate(account, path);
         model.addAttribute(account);
         model.addAttribute(meeting);
-        return "meeting/settings/meeting";
+        return MEETING_URL;
     }
 
-    @PostMapping("meeting")
-    public String publishMeeting(@CurrentUser Account account, @PathVariable String path,
-                                 RedirectAttributes attributes) {
-        Meeting meeting = meetingService.getMeetingToUpdateStatus(account, path);
-        meetingService.publish(meeting);
-        attributes.addFlashAttribute("message", "모임을 공개 했습니다.");
-        return "redirect:/meeting/" + meeting.getEncodedPath() + "/settings/meeting";
-    }
-
-
-    @GetMapping("meeting/{path}")
-    public String viewMeeting(@CurrentUser Account account, @PathVariable String path, Model model) {
+    @GetMapping(PATH)
+    public String viewMeeting(@CurrentAccount Account account, @PathVariable String path, Model model) {
         Meeting meeting = meetingService.getMeeting(path);
         model.addAttribute(account);
         model.addAttribute(meeting);
-        return "meeting/view";
+        return MEETING + VIEW;
     }
 
-    @GetMapping("meeting/{path}/members")
-    public String viewMeetingMembers(@CurrentUser Account account, @PathVariable String path, Model model) {
+    @GetMapping(PATH + MEMBERS)
+    public String viewMeetingMembers(@CurrentAccount Account account, @PathVariable String path, Model model) {
         Meeting meeting = meetingService.getMeeting(path);
         model.addAttribute(account);
         model.addAttribute(meeting);
-        return "meeting/members";
+        return MEETING + MEMBERS;
     }
 
 
-    @GetMapping("new-meeting")
-    public String viewNewMeeting(@CurrentUser Account account, Model model) {
+    @GetMapping(NEW)
+    public String viewNewMeeting(@CurrentAccount Account account, Model model) {
         model.addAttribute(account);
         model.addAttribute(new MeetingForm());
-        return "meeting/form";
+        return MEETING + FORM;
     }
 
-    @PostMapping("new-meeting")
-    public String submitNewMeeting(@CurrentUser Account account, @Valid MeetingForm meetingForm, Errors errors, Model model) {
+    @PostMapping(NEW)
+    public String submitNewMeeting(@CurrentAccount Account account, @Valid MeetingForm meetingForm, Errors errors, Model model) {
         if (errors.hasErrors()) {
-            return "meeting/form";
+            return MEETING + FORM;
         }
 
         Meeting newMeeting = meetingService.createNewMeeting(modelMapper.map(meetingForm, Meeting.class), account);
-        return "redirect:/meeting/" + newMeeting.getEncodedPath();
+        return "redirect:" + MEETING + newMeeting.getEncodedURL();
+    }
+
+    @GetMapping(PATH + "/join")
+    public String joinMeeting(@CurrentAccount Account account, @PathVariable String path) {
+        Meeting meeting = meetingRepository.findMeetingWithMembersByPath(path);
+        meetingService.addMember(meeting, account);
+        return "redirect:"+ MEETING + meeting.getEncodedURL() + MEMBERS;
+    }
+
+    @GetMapping(PATH + "/leave")
+    public String leaveMeeting(@CurrentAccount Account account, @PathVariable String path) {
+        Meeting meeting = meetingRepository.findMeetingWithMembersByPath(path);
+        meetingService.removeMember(meeting, account);
+        return "redirect:"+ MEETING + meeting.getEncodedURL() + MEMBERS;
     }
 
 }

@@ -47,7 +47,7 @@ class MeetingControllerTest extends AbstractContainerBaseTest {
     @WithAccount(TEST_ACCOUNT)
     @DisplayName("아젠다 개설 폼 조회")
     void createMeetingForm() throws Exception {
-        mockMvc.perform(get("/new-meeting"))
+        mockMvc.perform(get("/meeting/new"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("meeting/form"))
                 .andExpect(model().attributeExists("account"))
@@ -59,7 +59,7 @@ class MeetingControllerTest extends AbstractContainerBaseTest {
     @WithAccount(TEST_ACCOUNT)
     @DisplayName("아젠다 개설 - 완료")
     void createMeeting_success() throws Exception {
-        mockMvc.perform(post("/new-meeting")
+        mockMvc.perform(post("/meeting/new")
                         .param("path", "test-path")
                         .param("title", "meeting title")
                         .param("shortDescription", "short description of a meeting")
@@ -78,7 +78,7 @@ class MeetingControllerTest extends AbstractContainerBaseTest {
     @WithAccount(TEST_ACCOUNT)
     @DisplayName("아젠다 개설 - 실패")
     void createMeeting_fail() throws Exception {
-        mockMvc.perform(post("/new-meeting")
+        mockMvc.perform(post("/meeting/new")
                         .param("path", "wrong path")
                         .param("title", "meeting title")
                         .param("shortDescription", "short description of a meeting")

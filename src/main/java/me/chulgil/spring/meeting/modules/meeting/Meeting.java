@@ -1,12 +1,10 @@
 package me.chulgil.spring.meeting.modules.meeting;
 
-import jdk.jfr.Name;
 import lombok.*;
 import me.chulgil.spring.meeting.modules.account.domain.Account;
 import me.chulgil.spring.meeting.modules.account.domain.UserAccount;
 import me.chulgil.spring.meeting.modules.tag.Tag;
 import me.chulgil.spring.meeting.modules.zone.Zone;
-import org.springframework.security.core.userdetails.User;
 
 import javax.persistence.*;
 import java.net.URLEncoder;
@@ -60,6 +58,8 @@ public class Meeting {
 
     private LocalDateTime closedDateTime;
 
+    private LocalDateTime recruitingDateTime;
+
     private boolean recruiting;
 
     private boolean published;
@@ -76,8 +76,10 @@ public class Meeting {
 
     public boolean isJoinable(UserAccount userAccount) {
         Account account = userAccount.getAccount();
-        return this.isPublished() && this.isRecruiting()
-                && !this.members.contains(account) && !this.managers.contains(account);
+        return this.isPublished()
+                && this.isRecruiting()
+                && !this.members.contains(account)
+                && !this.managers.contains(account);
     }
 
     public boolean isMember(UserAccount userAccount) {
@@ -106,12 +108,39 @@ public class Meeting {
         return URLEncoder.encode(this.path, StandardCharsets.UTF_8);
     }
 
-    public void publish() {
+    public String getEncodedURL() {
+        return "/" + this.getEncodedPath();
+    }
+
+    public void publish(boolean publish) {
+
         if (this.closed || this.published) {
-            throw new RuntimeException("스터디를 공개할 수 없는 상태입니다. 스터디를 이미 공개했거나 종료했습니다.");
+            throw new RuntimeException("처리할 수 없습니다. 모임을 이미 활성화했거나 종료 했습니다.");
         }
 
-        this.published = true;
+        if (publish) {
+            this.published = true;
+        } else {
+            this.setClosed(true);
+        }
+
         this.publishedDateTime = LocalDateTime.now();
+    }
+
+    public boolean canUpdateRecruiting() {
+        return this.published && this.recruitingDateTime == null
+                || this.recruitingDateTime.isBefore(LocalDateTime.now().minusHours(1));
+    }
+    public void setRecruiting(boolean enable) {
+        if (canUpdateRecruiting()) {
+            this.recruiting = enable;
+            this.recruitingDateTime = LocalDateTime.now();
+        } else {
+            throw new RuntimeException("처리할 수 없습니다. 이미 활성화된 인원모집은 한시간 뒤 수정할 수 있습니다.");
+        }
+    }
+
+    public boolean isRemovable() {
+        return !this.published; // 이미 활성화 했던 모임은 삭제할 수 없다.
     }
 }

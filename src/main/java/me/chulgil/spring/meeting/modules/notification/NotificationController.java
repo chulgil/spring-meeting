@@ -3,7 +3,7 @@ package me.chulgil.spring.meeting.modules.notification;
 
 import lombok.RequiredArgsConstructor;
 import me.chulgil.spring.meeting.modules.account.domain.Account;
-import me.chulgil.spring.meeting.modules.main.CurrentUser;
+import me.chulgil.spring.meeting.modules.main.CurrentAccount;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +21,7 @@ public class NotificationController {
     private final NotificationService service;
 
     @GetMapping("/notifications")
-    public String getNotifications(@CurrentUser Account account, Model model) {
+    public String getNotifications(@CurrentAccount Account account, Model model) {
         List<Notification> notifications = repository.findByAccountAndCheckedOrderByCreatedDateTimeDesc(account, false);
         long numberOfChecked = repository.countByAccountAndChecked(account, true);
         putCategorizedNotifications(model, notifications, numberOfChecked, notifications.size());
@@ -32,7 +32,7 @@ public class NotificationController {
 
 
     @GetMapping("/notifications/old")
-    public String getOldNotifications(@CurrentUser Account account, Model model) {
+    public String getOldNotifications(@CurrentAccount Account account, Model model) {
         List<Notification> notifications = repository.findByAccountAndCheckedOrderByCreatedDateTimeDesc(account, true);
         long numberOfNotChecked = repository.countByAccountAndChecked(account, false);
         putCategorizedNotifications(model, notifications, notifications.size(), numberOfNotChecked);
@@ -41,7 +41,7 @@ public class NotificationController {
     }
 
     @DeleteMapping("/notifications")
-    public String deleteNotifications(@CurrentUser Account account) {
+    public String deleteNotifications(@CurrentAccount Account account) {
         repository.deleteByAccountAndChecked(account, true);
         return "redirect:/notifications";
     }

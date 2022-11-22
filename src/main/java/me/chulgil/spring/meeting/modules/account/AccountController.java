@@ -5,7 +5,7 @@ import me.chulgil.spring.meeting.modules.account.domain.Account;
 import me.chulgil.spring.meeting.modules.account.form.SignUpForm;
 import me.chulgil.spring.meeting.modules.account.validator.AccountRepository;
 import me.chulgil.spring.meeting.modules.account.validator.SignUpValidator;
-import me.chulgil.spring.meeting.modules.main.CurrentUser;
+import me.chulgil.spring.meeting.modules.main.CurrentAccount;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -70,13 +70,13 @@ public class AccountController {
     }
 
     @GetMapping("check-email")
-    public String checkEmail(@CurrentUser Account account, Model model) {
+    public String checkEmail(@CurrentAccount Account account, Model model) {
         model.addAttribute("email", account.getEmail());
         return "account/check-email";
     }
 
     @GetMapping("resend-confirm-email")
-    public String resendConfirmEmail(@CurrentUser Account account, Model model) {
+    public String resendConfirmEmail(@CurrentAccount Account account, Model model) {
         if (!account.canSendConfirmEmail()) {
             model.addAttribute("error", "인증 이메일은 1분에 한번만 전송할 수 있습니다.");
             model.addAttribute(account);
@@ -89,7 +89,7 @@ public class AccountController {
     }
 
     @GetMapping("profile/{nickname}")
-    public String viewProfile(@PathVariable String nickname, Model model, @CurrentUser Account account
+    public String viewProfile(@PathVariable String nickname, Model model, @CurrentAccount Account account
     ) throws IllegalAccessException {
         Account accountToView = accountService.getAccount(nickname);
         model.addAttribute("account", accountToView);
